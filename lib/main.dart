@@ -22,21 +22,36 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends ConsumerWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   static const _kHello = 'Hello, i am flutter.';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState createState() {
+    return MyHomePageState();
+  }
+}
+
+class MyHomePageState extends ConsumerState<MyHomePage> {
+  int? viewId;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Native View with channel'),
       ),
       body: Column(
         children: [
-          const Flexible(
-            child: NativeViewWidget(),
+          Flexible(
+            child: NativeViewWidget(
+              onNativeViewCreated: (id) {
+                viewId = id;
+                // 原生View创建完毕后，立刻构造Controller，实现数据通信
+                ref.read(nativeViewControllerFamily(id));
+              },
+            ),
           ),
           Flexible(
             child: Center(
@@ -45,10 +60,14 @@ class MyHomePage extends ConsumerWidget {
                 children: [
                   Text(
                       'Receive from native: ${ref.watch(nativeMessageProvider)}'),
-                  const Text('Send to native: $_kHello'),
+                  const Text('Send to native: ${MyHomePage._kHello}'),
                   ElevatedButton(
                     onPressed: () {
-                      // TODO 使用 [NativeViewController] 发送数据
+                      final id = viewId;
+                      if (id == null) return;
+                      ref
+                          .read(nativeViewControllerFamily(id))
+                          .sendToNative(MyHomePage._kHello);
                     },
                     child: const Text('Send'),
                   )

@@ -29,7 +29,7 @@ class NativeViewController {
       case _kMethodReceiveFromNative:
         // 读取参数后，更新Provider
         final message =
-            (call.arguments as Map<String, dynamic>)[_kParamMessage];
+            (call.arguments as Map<dynamic, dynamic>)[_kParamMessage];
         _reader(nativeMessageProvider.notifier).state = message;
         return Future.value(0);
     }
@@ -59,8 +59,8 @@ final nativeMessageProvider = StateProvider<String>((ref) {
   return "";
 });
 
-// TODO 原生View通信控制器
-final nativeViewControllerProvider =
-    StateProvider<NativeViewController?>((ref) {
-  return null;
+// 根据原生View的构建ID，创建控制类示例，确保与指定的原生View通讯
+final nativeViewControllerFamily =
+    StateProvider.autoDispose.family<NativeViewController, int>((ref, id) {
+  return NativeViewController(id, ref.read);
 });
