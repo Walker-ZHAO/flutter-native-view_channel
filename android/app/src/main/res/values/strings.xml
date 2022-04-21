@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receive_title">Receive from Flutter: %s</string>
+    <string name="send_title">Send to Flutter: %s</string>
+    <string name="send_value">Hello, i am android.</string>
+    <string name="send">Send</string>
+</resources>
